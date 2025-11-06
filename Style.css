@@ -1,0 +1,564 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0c0a1a;
+    background-image: linear-gradient(rgba(12, 10, 26, 0.85), rgba(12, 10, 26, 1)), url('https://media.istockphoto.com/id/177512311/pt/foto/fundo-de-espa%C3%A7o-com-estrelas-universo-gal%C3%A1xia-e-nebulosa.jpg?s=612x612&w=0&k=20&c=6aPtjOiUeqX9p2X1XtOVWpL-ryyPC0F4knWFVtHg5YU=');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    /* Evita rolagem horizontal no mobile */
+    overflow-x: hidden; 
+}
+.font-cinzel {
+    font-family: 'Cinzel', serif;
+}
+.game-container {
+    max-width: 800px;
+    width: 100%; /* Garante que não ultrapasse a tela */
+    min-height: 95vh;
+    background: rgba(19, 19, 38, 0.85);
+    backdrop-filter: blur(10px);
+    border: 2px solid #a37b4c;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+    animation: pulse-glow 4s infinite;
+    display: flex; /* Adicionado para garantir que flex-grow funcione */
+    flex-direction: column; /* Adicionado para garantir que flex-grow funcione */
+}
+.text-glow {
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6), 0 0 12px rgba(255, 165, 0, 0.4);
+}
+.btn-primary {
+    background: linear-gradient(145deg, #b98b59, #a37b4c);
+    color: #ffffff;
+    transition: all 0.3s ease;
+    border-bottom: 4px solid #7a5c39;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    cursor: pointer; /* Garante cursor de clique */
+}
+.btn-primary:hover {
+    background: linear-gradient(145deg, #c99b69, #b38b5c);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.btn-option {
+    background-color: rgba(47, 47, 79, 0.7);
+    backdrop-filter: blur(4px);
+    color: #e0e0e0;
+    border: 2px solid #4a4a70;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.btn-option:hover:not(:disabled) {
+    background-color: #4a4a70;
+    border-color: #a37b4c;
+    transform: translateY(-2px);
+}
+.btn-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.btn-option.correct {
+    background: linear-gradient(145deg, #28a745, #1e7e34);
+    border-color: #1e7e34 !important;
+    color: white;
+}
+.btn-option.wrong {
+    background: linear-gradient(145deg, #dc3545, #b02a37);
+    border-color: #b02a37 !important;
+    color: white;
+}
+.hp-bar-container {
+    background-color: #222;
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 2px solid #111;
+    padding: 2px;
+}
+.hp-bar {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+    border-radius: 9999px;
+}
+.hp-bar-player {
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+.progress-bar { transition: width 0.5s linear; }
+
+.sprite-container {
+    width: 10rem; /* 160px */
+    height: 10rem; /* 160px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+.sprite-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated; /* Mantém pixels nítidos se a imagem for pixel art */
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+#player-sprite-container {
+    transform: scaleX(-1);
+}
+.sprite-container.hit-effect {
+    animation: hitBounce 0.4s ease-out;
+}
+@keyframes hitBounce {
+    0% { transform: translateY(0) scaleX(var(--scale-x, 1)); }
+    25% { transform: translateY(-10px) scaleX(var(--scale-x, 1.05)); }
+    50% { transform: translateY(0) scaleX(var(--scale-x, 1)); }
+    75% { transform: translateY(-5px) scaleX(var(--scale-x, 1.02)); }
+    100% { transform: translateY(0) scaleX(var(--scale-x, 1)); }
+}
+
+.screen { 
+    opacity: 0; 
+    transition: opacity 0.5s ease-in-out; 
+    will-change: opacity; 
+    width: 100%; /* Garante que ocupe toda a largura */
+    flex-grow: 1; /* Permite que a tela ativa cresça para ocupar espaço */
+    display: flex; /* Necessário para flex-grow e alinhamento */
+    flex-direction: column; /* A maioria das telas é organizada verticalmente */
+}
+.screen.active { 
+    opacity: 1; 
+}
+/* Esconde telas inativas de forma acessível e funcional */
+.screen.hidden {
+    display: none !important; 
+}
+
+#feedback-text { min-height: 2.5rem; font-size: 1.5rem; font-weight: bold; transition: opacity 0.3s; }
+
+#platformer-canvas {
+    background: linear-gradient(#0c0a1a, #1f1b4a); /* Fundo padrão */
+    display: block; /* Evita espaço extra abaixo */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%; /* Garante que não vaze horizontalmente */
+}
+
+.btn-phase {
+    background-color: rgba(20, 20, 40, 0.5);
+    border: 1px solid #a37b4c;
+    color: #d1d5db;
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-grow: 1;
+    min-width: 180px;
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+.shake { animation: shake 0.5s; }
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); }
+}
+.pop-in { animation: pop-in 0.3s ease-out forwards; }
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); } 50% { box-shadow: 0 0 45px rgba(255, 215, 0, 0.7); } 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+#epilogue-screen.active {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+.epilogue-sofia-image {
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px solid #a37b4c;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    flex-shrink: 0; /* Evita que encolha */
+}
+.epilogue-sofia-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+.memory-game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 480px; /* Limita a largura máxima no desktop */
+    perspective: 1000px;
+    margin-left: auto; /* Centraliza */
+    margin-right: auto;
+}
+
+.memory-card {
+    background-color: transparent;
+    width: 100px; /* Tamanho base */
+    height: 140px;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    border: 2px solid #a37b4c;
+    border-radius: 8px;
+}
+
+.memory-card.flipped {
+    transform: rotateY(180deg);
+}
+
+.memory-card.matched {
+    opacity: 0.4;
+    cursor: default;
+    transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-front {
+    background-color: #e0d8c7;
+    transform: rotateY(180deg);
+    padding: 5px;
+}
+
+.card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-back {
+    background: linear-gradient(145deg, #5a4b3a, #4a3c2a);
+    font-size: 48px;
+    color: #a37b4c;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ============================================== */
+/* === ANIMAÇÃO DA INTRODUÇÃO (TEXTO) === */
+/* ============================================== */
+
+.crawl-perspective {
+    width: 100%;
+    max-width: 600px;
+    height: 70vh;
+    perspective: 300px;
+    overflow: hidden;
+    border: 2px solid #a37b4c;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.crawl-content {
+    position: absolute;
+    width: 90%;
+    margin: 0 5%;
+    text-align: center;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: #fde68a;
+    animation: crawl 25s linear forwards;
+    transform-origin: 50% 100%;
+    transform: rotateX(20deg) translateY(100%);
+}
+
+.crawl-content h2 {
+    font-size: 1.75rem;
+}
+
+@keyframes crawl {
+    from {
+        transform: rotateX(20deg) translateY(100%);
+    }
+    to {
+        transform: rotateX(20deg) translateY(-200%); 
+    }
+}
+
+/* ============================================== */
+/* === ANIMAÇÃO INTRODUÇÃO DA BATALHA (SPRITES) === */
+/* ============================================== */
+
+.battle-intro-arena {
+    position: relative;
+    box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+}
+
+.battle-intro-sprite {
+    position: absolute;
+    height: 80%; /* Altura máxima dos sprites */
+    display: flex;
+    align-items: flex-end; /* Alinha na parte de baixo */
+}
+
+.battle-intro-sprite img {
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6));
+}
+
+.player-side {
+    left: -20%; /* Começa fora da tela */
+    transform: scaleX(-1); /* Vira o player para a direita */
+    animation: player-entry 1s ease-out forwards 0.5s; /* Delay de 0.5s */
+}
+
+.enemy-side {
+    right: -20%; /* Começa fora da tela */
+    animation: enemy-entry 1s ease-out forwards 0.5s; /* Delay de 0.5s */
+}
+
+.battle-intro-vs {
+    opacity: 0;
+    animation: fade-in 0.8s ease-out forwards 1.2s; /* Aparece depois dos sprites */
+}
+
+.battle-intro-hp-container {
+    position: absolute;
+    width: 120px; /* Largura fixa para a barra de HP */
+    opacity: 0;
+    animation: fade-in 0.8s ease-out forwards 1.8s; /* Aparece depois dos sprites e VS */
+}
+
+.player-hp-intro-position {
+    bottom: 10%;
+    left: 10%;
+}
+
+.enemy-hp-intro-position {
+    bottom: 10%;
+    right: 10%;
+}
+
+@keyframes player-entry {
+    from { left: -20%; }
+    to { left: 10%; } /* Posição final na tela */
+}
+
+@keyframes enemy-entry {
+    from { right: -20%; }
+    to { right: 10%; } /* Posição final na tela */
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================= */
+/* === ESTILOS PARA A FASE FINAL DE PLATAFORMA === */
+/* ================================================= */
+
+#final-platformer-screen {
+    position: relative; 
+    justify-content: flex-start; /* Alinha conteúdo no topo */
+    padding-top: 1rem; /* Espaço acima do título */
+}
+
+#checkpoint-message-box {
+    backdrop-filter: blur(5px);
+    width: 90%; 
+    max-width: 400px;
+    z-index: 50; /* Garante que fique acima dos controles */
+}
+
+/* ================================================= */
+/* === ESTILOS PARA CONTROLES MOBILE === */
+/* ================================================= */
+/* O container #mobile-controls é posicionado via classes Tailwind no HTML */
+.mobile-btn {
+    user-select: none;
+    -webkit-user-select: none; 
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: manipulation; /* Ajuda a prevenir zoom/scroll no toque */
+    transition: transform 0.1s ease-out, background-color 0.1s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borda sutil */
+}
+.mobile-btn:active {
+    transform: scale(0.92); /* Efeito mais pronunciado */
+    background-color: rgba(255, 255, 255, 0.4) !important; /* Clareia mais ao tocar */
+}
+
+
+/* ========================================================= */
+/* === AJUSTES FINAIS DE RESPONSIVIDADE (MEDIA QUERIES) === */
+/* ========================================================= */
+
+@media (max-width: 640px) { /* sm breakpoint do Tailwind */
+    .game-container {
+        min-height: 90vh;
+        padding: 0.5rem; /* Menos padding */
+        border-width: 1px; /* Borda mais fina */
+    }
+    
+    /* Ajustes gerais de fonte para mobile */
+     h1 { font-size: 2rem; } 
+     h2 { font-size: 1.5rem; } 
+     h3 { font-size: 1.25rem; } 
+     p { font-size: 0.9rem; } 
+     button, .btn-option, .btn-primary, .btn-phase { font-size: 0.9rem; }
+     .font-cinzel { font-size: 1.1em; } /* Relativo ao base */
+
+     #start-screen h1 { font-size: 2.5rem; margin-bottom: 0.5rem;} 
+     #start-screen p { font-size: 1rem; margin-bottom: 1rem;}
+     #start-screen .max-w-2xl { padding: 1rem;} /* Menos padding na lenda */
+
+     #question-text { font-size: 1.1rem; min-height: 4rem; margin-bottom: 1rem; }
+     #options-container { gap: 0.5rem; } /* Menos espaço entre opções */
+     .btn-option { padding: 0.6rem 0.8rem; }
+     #use-hint-button span { font-size: 0.8rem;} /* Texto do botão de dica */
+
+     #end-title { font-size: 2rem; }
+     #epilogue-screen h2 { font-size: 1.75rem; }
+     .epilogue-sofia-image { width: 120px; height: 120px;} /* Imagem final menor */
+
+
+    /* Sprites na tela de combate */
+    .sprite-container {
+        width: 5rem; /* Menor */
+        height: 5rem;
+    }
+    #character-sprites {
+        height: 7rem;
+        margin-bottom: 0.5rem; /* Menos margem */
+    }
+    
+    /* Jogo da Memória */
+    #memory-game-screen h2 { font-size: 1.75rem;}
+    #memory-game-screen p { font-size: 1rem; margin-bottom: 1rem;}
+    .memory-game-board {
+        gap: 6px; 
+        max-width: 100%;
+        padding: 0 0.5rem; /* Adiciona padding lateral se necessário */
+    }
+    .memory-card {
+        width: 100%; 
+        height: auto; 
+        aspect-ratio: 10 / 14; 
+        border-width: 1px;
+    }
+    .card-back {
+        font-size: 2rem; 
+    }
+    
+    /* Canvas Plataforma */
+    #platformer-canvas {
+        width: 100% !important; 
+        height: auto !important; 
+        max-width: 100%;
+        border-width: 1px; 
+    }
+    
+    /* Intro Texto */
+    .crawl-perspective {
+        height: 60vh; 
+        border-width: 1px;
+    }
+    .crawl-content {
+        font-size: 0.9rem;
+        animation-duration: 35s; 
+    }
+    #skip-intro-button {
+        position: relative;
+        bottom: auto;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Intro Batalha (Sprites) */
+    #battle-intro-title { font-size: 1.75rem; margin-bottom: 1rem; }
+    .battle-intro-arena {
+        min-height: 180px; 
+        padding: 0.5rem;
+        border-width: 1px;
+    }
+    .battle-intro-sprite {
+        height: 65%; 
+    }
+    .battle-intro-vs {
+        font-size: 2.5rem; 
+    }
+    .battle-intro-hp-container {
+        width: 80px;
+        bottom: 5%; 
+        font-size: 0.7rem;
+    }
+    .player-hp-intro-position { left: 5%; }
+    .enemy-hp-intro-position { right: 5%; }
+    #battle-intro-message { font-size: 0.9rem; margin-top: 0.75rem;}
+
+    /* Fase Final Plataforma */
+    #final-platformer-screen { padding: 0.5rem; } /* Menos padding na tela */
+    #final-platformer-screen h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    #final-platformer-screen p { font-size: 0.85rem; margin-bottom: 0.75rem; }
+    #checkpoint-message-box {
+         padding: 0.75rem;
+         max-width: 85%;
+     }
+     #checkpoint-text {
+         font-size: 0.9rem;
+     }
+     #continue-platformer-button {
+         font-size: 0.9rem;
+         padding: 0.4rem 0.8rem;
+     }
+
+     /* Controles Mobile (Visíveis apenas aqui) */
+     #mobile-controls {
+         display: flex; /* Garante que sejam visíveis */
+         bottom: 1rem; /* Mais perto da borda */
+         padding: 0 1rem; /* Padding lateral */
+     }
+     .mobile-btn {
+         padding: 0.9rem; /* Aumenta área de toque */
+         font-size: 1.6rem; 
+         background-color: rgba(75, 85, 99, 0.6); /* Cor base mais escura/transparente */
+         border: 1px solid rgba(255, 255, 255, 0.2);
+     }
+      /* Ajusta posição do botão de pulo */
+     #mobile-controls > button#btn-jump {
+         margin-right: 0.5rem; 
+     }
+     #mobile-controls > div { /* Container dos botões esq/dir */
+         margin-left: 0.5rem;
+     }
+
+}
+
+/* Esconde controles mobile por padrão (em telas maiores que sm) */
+@media (min-width: 641px) { 
+    #mobile-controls {
+        display: none;
+    }
+}
