@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crônicas do Saber</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="text-white flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="game-container w-full mx-auto rounded-xl p-4 sm:p-8 flex flex-col">
+
+        <div id="start-screen" class="screen text-center flex flex-col justify-center items-center h-full">
+            <h1 class="text-4xl md:text-6xl font-cinzel text-amber-300 mb-4 text-glow">Crônicas do Saber</h1>
+            <p class="text-lg md:text-xl font-cinzel mb-8">O Destino de um Reino em suas Mãos</p>
+            
+            <div class="max-w-2xl text-left bg-black bg-opacity-30 p-6 rounded-lg border border-amber-800">
+                <h2 class="text-2xl font-cinzel text-amber-400 mb-4">Bem-vindo(a) a Crônicas do Saber! </h2>
+                <p class="mb-4 text-gray-300">A Jornada: Você deverá desvendar os segredos de um antigo Livro Mágico, recuperando suas páginas perdidas.<br>
+                Recursos: Atena possui algumas Dicas que podem ajudar nas perguntas mais difíceis, mas use-as com sabedoria!</p>
+                <p class="text-gray-300">Derrota e Vitória: Acerte as respostas para causar dano. Erre, e Atena sofrerá as consequências.<br>
+                Minigames: Após cada vitória, você precisará reconstruir a página recuperada em um desafio de memória, fortalecendo o poder do livro.</p>
+                 <p class="text-gray-300">O Objetivo Final: Avance pelas fases, derrote todos os guardiões e enfrente 
+                 o Dragão das Sombras para trazer a luz de volta ao reino.</p>
+            </div>
+
+            <div id="phase-selection-container" class="max-w-2xl w-full mt-6">
+                <h3 class="text-xl font-cinzel text-amber-400 mb-4">Continuar a fase:</h3>
+                <div id="phase-buttons-container" class="flex flex-wrap justify-center gap-3">
+                    </div>
+            </div>
+
+            <button id="start-button" class="btn-primary font-cinzel text-2xl py-3 px-8 rounded-lg mt-8">Iniciar Jornada</button>
+        </div>
+
+        <div id="intro-crawl-screen" class="screen hidden flex-grow flex flex-col justify-center items-center p-4">
+            <div class="crawl-perspective">
+                <div class="crawl-content">
+                    <h2 class="text-3xl font-cinzel text-amber-300 mb-8 text-glow">A Lenda...</h2>
+                    <p class="mb-4">Era uma vez, em um lugar distante, um reino próspero e feliz.</p>
+                    <p class="mb-4">Até que um dia, um dragão feroz e seus capangas trouxeram a escuridão, espalhando o medo.</p>
+                    <p class="mb-4">Uma guerreira, chamada Atena, ergue-se como a última esperança.</p>
+                    <p class="mb-4">Para trazer a paz, ela deve desvendar os segredos de um livro mágico, página por página, enfrentando os monstros com o poder do conhecimento.</p>
+                    <p class="mt-6 font-bold text-amber-200">Embarque nesta jornada e defina o destino deste reino!</p>
+                </div>
+            </div>
+            <button id="skip-intro-button" class="btn-primary font-cinzel text-lg py-2 px-6 rounded-lg mt-8 absolute bottom-10">
+                Pular
+            </button>
+        </div>
+
+        <div id="battle-intro-screen" class="screen hidden flex-grow flex flex-col justify-center items-center p-4">
+            <h2 id="battle-intro-title" class="text-4xl font-cinzel text-amber-300 mb-8 text-glow text-center"></h2>
+            <div class="battle-intro-arena w-full max-w-xl bg-black bg-opacity-30 rounded-lg p-6 flex justify-around items-center border-2 border-amber-800 relative overflow-hidden min-h-[250px] md:min-h-[350px]">
+                <div id="intro-player-sprite" class="battle-intro-sprite player-side">
+                    <img src="" alt="Atena" class="max-h-full">
+                </div>
+                <span class="font-cinzel text-5xl text-red-500 z-10 battle-intro-vs">VS</span>
+                <div id="intro-enemy-sprite" class="battle-intro-sprite enemy-side">
+                    <img src="" alt="Inimigo" class="max-h-full">
+                </div>
+                <div class="battle-intro-hp-container player-hp-intro-position">
+                    <div class="hp-bar-container w-full h-4">
+                        <div class="hp-bar hp-bar-player" style="width: 100%;"></div>
+                    </div>
+                    <p class="text-sm text-center mt-1">Atena</p>
+                </div>
+                <div class="battle-intro-hp-container enemy-hp-intro-position">
+                    <div class="hp-bar-container w-full h-4">
+                        <div class="hp-bar" style="width: 100%;"></div>
+                    </div>
+                    <p class="text-sm text-center mt-1"><span id="intro-enemy-name"></span></p>
+                </div>
+            </div>
+            <p id="battle-intro-message" class="text-lg text-gray-300 mt-6"></p>
+        </div>
+
+        <div id="game-screen" class="screen hidden flex-grow flex flex-col">
+            <div id="status-area" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-black bg-opacity-30 p-4 rounded-lg border border-blue-400">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-cinzel">Atena, a Guerreira </h2>
+                        <div id="player-status-icons" class="flex items-center space-x-2">
+                            <div class="relative">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-300"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span id="hint-count" class="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">1</span>
+                            </div>
+                            <div class="relative">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                                <span id="pages-collected" class="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hp-bar-container w-full h-4 mt-2">
+                        <div id="player-hp-bar" class="hp-bar hp-bar-player"></div>
+                    </div>
+                    <p class="text-sm text-right mt-1"><span id="player-hp-text">5</span> / 5 HP</p>
+                </div>
+                <div class="flex items-center justify-center text-center">
+                    <h3 id="central-message" class="text-2xl font-cinzel text-amber-300 text-glow"></h3>
+                </div>
+                <div id="enemy-status-container" class="bg-black bg-opacity-30 p-4 rounded-lg border border-red-500 hidden">
+                    <h2 id="enemy-name" class="text-xl font-cinzel"></h2>
+                    <div class="hp-bar-container w-full h-4 mt-2">
+                        <div id="enemy-hp-bar" class="hp-bar"></div>
+                    </div>
+                    <p class="text-sm text-right mt-1"><span id="enemy-hp-text">5</span> / 5 HP</p>
+                </div>
+            </div>
+            
+            <div id="main-content-area" class="flex-grow flex flex-col justify-center items-center bg-black bg-opacity-20 p-6 rounded-lg border border-amber-800">
+                <div id="narrative-view" class="text-center hidden"> 
+                    {''}
+                </div>
+                
+                <div id="combat-view" class="hidden w-full max-w-3xl text-center">
+                    <div id="character-sprites" class="flex justify-between items-center mb-4 px-2 sm:px-8 h-40">
+                        <div id="player-sprite-container" class="sprite-container" style="--scale-x: -1;"></div>
+                        <div class="font-cinzel text-2xl text-red-500 self-center">VS</div>
+                        <div id="enemy-sprite-container" class="sprite-container" style="--scale-x: 1;"></div>
+                    </div>
+                    <p id="feedback-text" class="font-cinzel mb-4"></p>
+                    <div id="timer-container" class="mb-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div id="timer-bar" class="bg-amber-400 h-2.5 rounded-full progress-bar"></div>
+                        </div>
+                    </div>
+                    <p id="question-category" class="text-sm text-amber-300 mb-2 font-semibold"></p>
+                    <p id="question-text" class="text-xl md:text-2xl mb-6 min-h-[6rem] flex items-center justify-center"></p>
+                    <div id="options-container" class="grid grid-cols-1 gap-4"></div>
+                    <div class="mt-6 flex justify-center">
+                        <button id="use-hint-button" class="btn-option text-yellow-300 border-yellow-500 py-2 px-5 rounded-lg flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-300"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>Usar Dica (Reduz Dano)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="memory-game-screen" class="screen hidden flex-grow flex flex-col justify-center items-center p-4">
+            <h2 class="text-3xl font-cinzel text-amber-300 mb-2 text-glow">Página Rasgada</h2>
+            <p class="text-lg mb-6 text-gray-300">Reconstrua a página do livro combinando os símbolos!</p>
+            <div id="memory-game-board" class="memory-game-board">
+                </div>
+            <button id="continue-to-next-phase-button" class="btn-primary font-cinzel text-xl py-2 px-8 rounded-lg mt-8 hidden">
+                Continuar Jornada
+            </button>
+        </div>
+
+        <div id="end-screen" class="screen hidden text-center flex-grow flex flex-col justify-center items-center">
+            <h2 id="end-title" class="text-5xl font-cinzel text-amber-300 mb-4 text-glow"></h2>
+            <p id="end-message" class="text-xl mb-8 max-w-lg"></p>
+            <button id="restart-button" class="btn-primary font-cinzel text-2xl py-3 px-8 rounded-lg">Jogar Novamente</button>
+        </div>
+        
+        <div id="final-platformer-screen" class="screen hidden text-center flex-grow flex flex-col justify-center items-center p-2 relative">
+            <h2 class="text-3xl font-cinzel text-amber-300 mb-2 text-glow">O Caminho Final</h2>
+            <p class="mb-4 text-lg">Supere os últimos obstáculos e alcance a porta para a paz!</p>
+            <canvas id="platformer-canvas" class="border-2 border-amber-800 rounded-lg"></canvas>
+            
+            <div id="mobile-controls" class="fixed bottom-4 left-0 right-0 flex justify-between px-4 sm:hidden z-30"> 
+                {''}
+                <div class="space-x-4">
+                    <button id="btn-left" class="mobile-btn bg-amber-600/70 p-4 rounded-full text-white text-2xl">◀</button>
+                    <button id="btn-right" class="mobile-btn bg-amber-600/70 p-4 rounded-full text-white text-2xl">▶</button>
+                </div>
+                <button id="btn-jump" class="mobile-btn bg-blue-600/70 p-5 rounded-full text-white text-2xl">▲</button>
+            </div>
+            <div id="checkpoint-message-box" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 border-2 border-amber-500 rounded-lg p-6 max-w-md text-center z-20">
+                <p id="checkpoint-text" class="text-lg text-amber-200 mb-4"></p>
+                <button id="continue-platformer-button" class="btn-primary font-cinzel text-lg py-2 px-6 rounded-lg">Continuar</button>
+            </div>
+        </div>
+
+        <div id="epilogue-screen" class="screen hidden text-center flex-grow flex flex-col justify-center items-center p-4">
+            <div class="epilogue-sofia-image mb-6">
+                <img src="https://i.imgur.com/j8v34A5.png" alt="Atena vitoriosa"> 
+            </div>
+            <div class="max-w-xl text-center bg-black bg-opacity-40 p-6 rounded-lg border-2 border-amber-500">
+                <h2 class="text-3xl font-cinzel text-amber-300 mb-4 text-glow">A Paz foi Restaurada!</h2>
+                <p class="text-gray-200">
+                    Com coragem e o poder do conhecimento, Atena superou todos os desafios. O Dragão das Sombras foi banido, e seus lacaios dispersos. A luz retornou ao reino, a sabedoria floresceu novamente, e a paz reinou sob a proteção da heroína.
+                </p>
+                <p class="mt-4 text-amber-200 font-semibold">Obrigado por jogar Crônicas do Saber!</p>
+            </div>
+            <button id="back-to-start-button" class="btn-primary font-cinzel text-xl py-2 px-8 rounded-lg mt-8">Voltar ao Início</button>
+        </div>
+
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
